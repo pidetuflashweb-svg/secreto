@@ -1,0 +1,317 @@
+root@pc26-15:/etc/NetworkManager/system-connections# cat Andared_Corporativo.nmconnection
+ [connection]
+ id=Andared_Corporativo
+ uuid=79ab78ae-173a-4795-9359-2a46c0c219f0
+ type=wifi
+ interface-name=wlo1
+ permissions=
+ timestamp=1702383315
+[wifi]
+ mac-address-blacklist=
+ mode=infrastructure
+ seen-bssids=20:A6:CD:F0:8C:11;B0:B8:67:BC:36:41;B0:B8:67:BC:36:51;C8:B5:AD:42:1F:11;C8:B5:AD:42:3E:41;C8:B5:AD:42:3E:51;C8:B5:AD:42:45:11;C8:B5:AD:42:46:A1;C8:B5:AD:42:46:B1;C8:B5:AD:42:47:11;C8:B5:AD:42:47:71;C8:B5:AD:42:4C:F1;C8:B5:AD:43:43:C1;C8:B5:AD:43:43:D1;C8:B5:AD:43:44:91;C8:B5:AD:43:45:51;C8:B5:AD:43:50:01;C8:B5:AD:43:50:11;C8:B5:AD:43:50:F1;C8:B5:AD:43:51:11;C8:B5:AD:43:51:F1;C8:B5:AD:43:53:01;C8:B5:AD:43:53:11;C8:B5:AD:43:53:C1;C8:B5:AD:43:53:D1;C8:B5:AD:44:5C:B1;
+ ssid=Andared_Corporativo
+[wifi-security]
+ key-mgmt=wpa-eap
+[802-1x]
+ eap=ttls;
+ identity=23005062-sala-carro3
+ password=Auringis3!
+ phase2-autheap=gtc
+[ipv4]
+ dns-search=
+ method=auto
+[ipv6]
+ addr-gen-mode=stable-privacy
+ dns-search=
+ method=auto
+[proxy]
+ root@pc26-15:/etc/NetworkManager/system-connections#
+en esta red como me conecto que debo hacer en mi parrot os
+Worked for 24s · 1 step
+Para conectarte a esta red WPA2-Enterprise (EAP-TTLS) en Parrot OS tienes dos opciones:
+Opción 1: Modo Gráfico (NetworkManager)
+Haz clic en el icono de Wi-Fi → "Configurar conexiones" o ve a Ajustes → Red
+Selecciona "Andared_Corporativo" de la lista de redes disponibles
+En la ventana de autenticación, configura:
+Seguridad: WPA y WPA2 Enterprise
+Autenticación: Tunneled TLS (TTLS)
+Identidad: 23005062-sala-carro3
+Contraseña: Auringis3!
+Método de autenticación interna (fase 2): GTC (Generic Token Card)
+Guarda y conecta
+Opción 2: Línea de Comandos (nmcli)
+bash
+# Crear la conexión
+sudo nmcli connection add type wifi \
+  con-name "Andared_Corporativo" \
+  ifname wlo1 \
+  ssid "Andared_Corporativo" \
+  wifi-sec.key-mgmt wpa-eap \
+  802-1x.eap ttls \
+  802-1x.identity "23005062-sala-carro3" \
+  802-1x.password "Auringis3!" \
+  802-1x.phase2-auth gtc
+
+# Conectar
+sudo nmcli connection up Andared_Corporativo
+Opción 3: Copiar el archivo directamente
+Como ya tienes el archivo de configuración completo:
+bash
+# Copiar al directorio de NetworkManager
+sudo cp Andared_Corporativo.nmconnection /etc/NetworkManager/system-connections/
+
+# Establecer permisos correctos (solo root puede leer)
+sudo chmod 600 /etc/NetworkManager/system-connections/Andared_Corporativo.nmconnection
+
+# Recargar conexiones
+sudo nmcli connection reload
+
+# Conectar
+sudo nmcli connection up Andared_Corporativo
+Nota importante: El archivo que mostraste contiene la contraseña en texto plano (password=Auringis3!). Asegúrate de que los permisos sean 600 (lectura/escritura solo para root) por seguridad.
+¿Prefieres usar el modo gráfico o la terminal?
+???
+Worked for 19s · 2 steps
+Veo que estás en la ventana de edición de la conexión pero en la pestaña Wi-Fi. Para configurar la autenticación EAP-TTLS necesitas ir a la pestaña "Wi-Fi Security".
+Haz clic en la pestaña "Wi-Fi Security" y configura así:
+Security: Selecciona "WPA & WPA2 Enterprise" (o "WPA2 Enterprise")
+
+
+Authentication: Selecciona "Tunneled TLS" (TTLS)
+
+
+Identity: Escribe: 23005062-sala-carro3
+
+
+Password: Escribe: Auringis3!
+
+
+Phase 2 authentication (Autenticación de fase 2): Selecciona "GTC" (Generic Token Card)
+
+
+CA certificate (Certificado CA): Deja en "(None)" o selecciona "System CA certificates" si no tienes un certificado específico
+
+
+Haz clic en "Save" (Guardar)
+
+
+Después de guardar, la conexión debería funcionar. Si tienes algún error específico, dime qué mensaje te aparece.
+¿Puedes ir a esa pestaña y confirmar qué opciones ves disponibles?
+voy bien que me falta
+Worked for 14s · 1 step
+Perfecto, ya estás en la pestaña Wi-Fi Security. Veo que casi todo está correcto, pero hay dos cambios que debes hacer:
+Cambios necesarios:
+Inner authentication: Cambia de "PAP" a "GTC" (Generic Token Card)
+
+
+Haz clic en el dropdown donde dice "PAP" y selecciona GTC
+Username: El campo Username está vacío. Debes escribir ahí:
+
+
+23005062-sala-carro3
+Configuración final debe quedar así:
+Campo
+Valor
+Security
+WPA/WPA2 Enterprise
+Authentication
+Tunneled TLS (TTLS)
+Anonymous identity
+23005062-sala-carro3 (o déjalo vacío)
+Username
+23005062-sala-carro3 ← AGREGAR
+Inner authentication
+GTC ← CAMBIAR de PAP
+Password
+Auringis3!
+
+Después de hacer estos cambios, haz clic en Save y debería conectarte.
+¿Puedes cambiar el "Inner authentication" a GTC y agregar el username?
+puedo grgar el username pero el gtc no me apcaere como opcion
+Worked for 14s · 1 step
+Si GTC no aparece en las opciones de la interfaz gráfica, prueba con MSCHAPv2 (es el más común y a veces los servidores lo aceptan incluso si el archivo dice GTC).
+Opción 1: Prueba con MSCHAPv2
+Cambia Inner authentication a MSCHAPv2
+Agrega el Username: 23005062-sala-carro3
+Guarda e intenta conectar
+Si no funciona o rechaza la conexión, usa el método de línea de comandos que permite configurar GTC exactamente como está en el archivo:
+Opción 2: Línea de comandos (recomendado)
+bash
+# Elimina primero la conexión actual si existe
+sudo nmcli connection delete Andared_Corporativo
+
+# Crea la conexión con los parámetros exactos
+sudo nmcli connection add type wifi \
+  con-name "Andared_Corporativo" \
+  ifname wlo1 \
+  ssid "Andared_Corporativo" \
+  wifi-sec.key-mgmt wpa-eap \
+  802-1x.eap ttls \
+  802-1x.identity "23005062-sala-carro3" \
+  802-1x.password "Auringis3!" \
+  802-1x.phase2-auth gtc
+
+# Conectar
+sudo nmcli connection up Andared_Corporativo
+Opción 3: Copiar el archivo directamente
+Como ya tienes el archivo de configuración correcto:
+bash
+sudo cp Andared_Corporativo.nmconnection /etc/NetworkManager/system-connections/
+sudo chmod 600 /etc/NetworkManager/system-connections/Andared_Corporativo.nmconnection
+sudo nmcli connection reload
+sudo nmcli connection up Andared_Corporativo
+¿Quieres probar primero con MSCHAPv2 en la GUI o prefieres usar la línea de comandos directamente?
+─[✗]─[root@parrot]─[/home/live]
+ └──╼ #sudo nmcli connection add type wifi
+ con-name "Andared_Corporativo"
+ ifname wlo1
+ ssid "Andared_Corporativo"
+ wifi-sec.key-mgmt wpa-eap
+ 802-1x.eap ttls
+ 802-1x.identity "23005062-sala-carro3"
+ 802-1x.password "Auringis3!"
+ 802-1x.phase2-auth gtc
+ Connection 'Andared_Corporativo' (95c7b725-db3e-4b5b-b443-1bef40fd8b28) successfully added.
+ ┌─[root@parrot]─[/home/live]
+ └──╼ #sudo nmcli connection up Andared_Corporativo
+ Passwords or encryption keys are required to access the wireless network 'Andared_Corporativo'.
+ Warning: password for '802-1x.identity' not given in 'passwd-file' and nmcli cannot ask without '--ask' option.
+ Error: Connection activation failed: Secrets were required, but not provided
+ Hint: use 'journalctl -xe NM_CONNECTION=95c7b725-db3e-4b5b-b443-1bef40fd8b28 + NM_DEVICE=wlo1' to get more details.
+ ┌─[✗]─[root@parrot]─[/home/live]
+ └──╼ #
+Worked for 17s · 1 step
+El problema es que nmcli necesita la opción --ask para solicitar la contraseña interactivamente, o la contraseña no se guardó correctamente.
+Solución rápida:
+bash
+sudo nmcli connection up Andared_Corporativo --ask
+Te pedirá la contraseña, escribe: Auringis3!
+
+Si quieres guardar la contraseña permanentemente (para no escribirla cada vez):
+bash
+# Modificar la conexión para guardar el password correctamente
+sudo nmcli connection modify Andared_Corporativo 802-1x.password "Auringis3!"
+
+# Intentar conectar de nuevo
+sudo nmcli connection up Andared_Corporativo
+
+Alternativa: Usar el archivo que ya tenías
+Como el archivo original ya tenía todo configurado correctamente:
+bash
+# Elimina la conexión que acabas de crear
+sudo nmcli connection delete Andared_Corporativo
+
+# Copia el archivo original
+sudo cp Andared_Corporativo.nmconnection /etc/NetworkManager/system-connections/
+sudo chmod 600 /etc/NetworkManager/system-connections/Andared_Corporativo.nmconnection
+sudo nmcli connection reload
+sudo nmcli connection up Andared_Corporativo
+Prueba primero con: sudo nmcli connection up Andared_Corporativo --ask
+¿Funciona con --ask?
+en la esquinaa aparce algo
+Worked for 10s · 1 step
+Veo que la conexión aparece pero dice "deactivated" y "No secrets were provided" (no se proporcionaron secretos/contraseña).
+Esto confirma que la contraseña no se guardó correctamente. Usa el archivo original que ya tenías configurado correctamente:
+bash
+# Elimina la conexión actual
+sudo nmcli connection delete Andared_Corporativo
+
+# Copia el archivo original que ya tenías
+sudo cp Andared_Corporativo.nmconnection /etc/NetworkManager/system-connections/
+
+# Establece permisos seguros
+sudo chmod 600 /etc/NetworkManager/system-connections/Andared_Corporativo.nmconnection
+
+# Recarga las conexiones
+sudo nmcli connection reload
+
+# Conecta
+sudo nmcli connection up Andared_Corporativo
+El archivo original ya tiene la contraseña (password=Auringis3!) y la configuración GTC completa, así que debería conectar inmediatamente sin pedir contraseña.
+O si prefieres probar rápido con la conexión actual:
+bash
+sudo nmcli connection up Andared_Corporativo --ask
+Y cuando pida el password, escribe: Auringis3!
+¿Cuál prefieres probar?
+root@pc26-15:/etc/NetworkManager/system-connections# cat Andared_Corporativo.nmconnection
+ [connection]
+ id=Andared_Corporativo
+ uuid=79ab78ae-173a-4795-9359-2a46c0c219f0
+ type=wifi
+ interface-name=wlo1
+ permissions=
+ timestamp=1702383315
+[wifi]
+ mac-address-blacklist=
+ mode=infrastructure
+ seen-bssids=20:A6:CD:F0:8C:11;B0:B8:67:BC:36:41;B0:B8:67:BC:36:51;C8:B5:AD:42:1F:11;C8:B5:AD:42:3E:41;C8:B5:AD:42:3E:51;C8:B5:AD:42:45:11;C8:B5:AD:42:46:A1;C8:B5:AD:42:46:B1;C8:B5:AD:42:47:11;C8:B5:AD:42:47:71;C8:B5:AD:42:4C:F1;C8:B5:AD:43:43:C1;C8:B5:AD:43:43:D1;C8:B5:AD:43:44:91;C8:B5:AD:43:45:51;C8:B5:AD:43:50:01;C8:B5:AD:43:50:11;C8:B5:AD:43:50:F1;C8:B5:AD:43:51:11;C8:B5:AD:43:51:F1;C8:B5:AD:43:53:01;C8:B5:AD:43:53:11;C8:B5:AD:43:53:C1;C8:B5:AD:43:53:D1;C8:B5:AD:44:5C:B1;
+ ssid=Andared_Corporativo
+[wifi-security]
+ key-mgmt=wpa-eap
+[802-1x]
+ eap=ttls;
+ identity=23005062-sala-carro3
+ password=Auringis3!
+ phase2-autheap=gtc
+[ipv4]
+ dns-search=
+ method=auto
+[ipv6]
+ addr-gen-mode=stable-privacy
+ dns-search=
+ method=auto
+[proxy]
+ root@pc26-15:/etc/NetworkManager/system-connections#
+esto lo saque de un portatil que si estaba conectado a esa red
+Worked for 14s · 1 step
+Perfecto, ese archivo viene de un portátil que ya está conectado, así que la configuración es 100% correcta. Solo necesitas copiarlo a tu Parrot OS.
+Pasos para copiar el archivo:
+En tu Parrot OS (donde estás trabajando ahora), ejecuta:
+bash
+# Crear el archivo con el contenido exacto
+sudo tee /etc/NetworkManager/system-connections/Andared_Corporativo.nmconnection > /dev/null << 'EOF'
+[connection]
+id=Andared_Corporativo
+uuid=79ab78ae-173a-4795-9359-2a46c0c219f0
+type=wifi
+interface-name=wlo1
+permissions=
+timestamp=1702383315
+
+[wifi]
+mac-address-blacklist=
+mode=infrastructure
+seen-bssids=20:A6:CD:F0:8C:11;B0:B8:67:BC:36:41;B0:B8:67:BC:36:51;C8:B5:AD:42:1F:11;C8:B5:AD:42:3E:41;C8:B5:AD:42:3E:51;C8:B5:AD:42:45:11;C8:B5:AD:42:46:A1;C8:B5:AD:42:46:B1;C8:B5:AD:42:47:11;C8:B5:AD:42:47:71;C8:B5:AD:42:4C:F1;C8:B5:AD:43:43:C1;C8:B5:AD:43:43:D1;C8:B5:AD:43:44:91;C8:B5:AD:43:45:51;C8:B5:AD:43:50:01;C8:B5:AD:43:50:11;C8:B5:AD:43:50:F1;C8:B5:AD:43:51:11;C8:B5:AD:43:51:F1;C8:B5:AD:43:53:01;C8:B5:AD:43:53:11;C8:B5:AD:43:53:C1;C8:B5:AD:43:53:D1;C8:B5:AD:44:5C:B1;
+ssid=Andared_Corporativo
+
+[wifi-security]
+key-mgmt=wpa-eap
+
+[802-1x]
+eap=ttls;
+identity=23005062-sala-carro3
+password=Auringis3!
+phase2-autheap=gtc
+
+[ipv4]
+dns-search=
+method=auto
+
+[ipv6]
+addr-gen-mode=stable-privacy
+dns-search=
+method=auto
+
+[proxy]
+EOF
+
+# Establecer permisos correctos (importante)
+sudo chmod 600 /etc/NetworkManager/system-connections/Andared_Corporativo.nmconnection
+
+# Recargar conexiones
+sudo nmcli connection reload
+
+# Conectar
+sudo nmcli connection up Andared_Corporativo
+
